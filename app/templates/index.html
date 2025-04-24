@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Research Paper Summarizer</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <h1>Research Paper Summarizer</h1>
+
+    <section>
+        <h2>Search Semantic Scholar</h2>
+        <input type="text" id="searchQuery" placeholder="Search topic...">
+        <button onclick="searchPapers()">Search</button>
+        <ul id="searchResults"></ul>
+    </section>
+
+    <section>
+        <h2>Upload a Research Paper (PDF)</h2>
+        <input type="file" id="pdfFile"><br>
+        <button onclick="uploadPDF()">Upload and Summarize</button>
+    </section>
+
+    <section id="summarySection" style="display:none;">
+        <h2>Structured Summary</h2>
+        <p><strong>Title:</strong> <span id="title"></span></p>
+        <p><strong>Authors:</strong> <span id="authors"></span></p>
+        <h3>Introduction</h3>
+        <p id="introduction"></p>
+        <h3>Dataset Description</h3>
+        <p id="dataset"></p>
+        <h3>Methodology</h3>
+        <p id="methodology"></p>
+        <h3>Evaluation</h3>
+        <p id="evaluation"></p>
+    </section>
+
+    <script>
+        async function searchPapers() {
+            const query = document.getElementById('searchQuery').value;
+            const res = await fetch(`/search?q=${encodeURIComponent(query)}`);
+            const data = await res.json();
+            const list = document.getElementById('searchResults');
+            list.innerHTML = '';
+            data.forEach(paper => {
+                const item = document.createElement('li');
+                item.innerHTML = `<a href="${paper.url}" target="_blank">${paper.title}</a>`;
+                list.appendChild(item);
+            });
+        }
+
+        async function uploadPDF() {
+            const file = document.getElementById('pdfFile').files[0];
+            if (!file) return alert("Please select a PDF file.");
+
+            const formData = new FormData();
+            formData.append('file', file);
+
+            const res = await fetch('/upload', {
+                method: 'POST',
+                body: formData
+            });
+
+            const data = await res.json();
+            document.getElementById('summarySection').style.display = 'block';
+            document.getElementById('title').textContent = data.title;
+            document.getElementById('authors').textContent = data.authors;
+            document.getElementById('introduction').textContent = data.introduction;
+            document.getElementById('dataset').textContent = data.dataset;
+            document.getElementById('methodology').textContent = data.methodology;
+            document.getElementById('evaluation').textContent = data.evaluation;
+        }
+    </script>
+</body>
+</html>

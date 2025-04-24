@@ -1,0 +1,12 @@
+body {
+    font-family: Arial, sans-serif;
+    margin: 2em;
+}
+input, button {
+    padding: 0.5em;
+    margin: 0.5em 0;
+}
+ul {
+    list-style-type: none;
+    padding: 0;
+}
